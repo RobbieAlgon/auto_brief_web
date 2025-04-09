@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import axios from 'axios';
+import { generateBriefing } from '../lib/api';
 
 interface TextInputProps {
   onBriefingGenerated: (briefing: any) => void;
@@ -15,10 +15,8 @@ export function TextInput({ onBriefingGenerated }: TextInputProps) {
 
     setLoading(true);
     try {
-      const response = await axios.post('http://localhost:8000/api/generate-briefing', {
-        text: text.trim()
-      });
-      onBriefingGenerated(response.data);
+      const briefing = await generateBriefing(text.trim());
+      onBriefingGenerated(briefing);
       setText('');
     } catch (error) {
       console.error('Error generating briefing:', error);
