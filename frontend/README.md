@@ -21,6 +21,7 @@ npm install
      - `VITE_SUPABASE_URL`: URL do seu projeto Supabase
      - `VITE_SUPABASE_ANON_KEY`: Chave anônima do Supabase
      - `VITE_API_URL`: URL da API backend (opcional, padrão: http://localhost:8000)
+     - `VITE_PRODUCTION_API_URL`: URL da API em produção
 
 ## Scripts Disponíveis
 
@@ -49,11 +50,21 @@ src/
 ```bash
 npm run build
 ```
-3. Os arquivos serão gerados na pasta `dist/`
+
+3. O build será gerado na pasta `dist/`
 
 ## Deploy
 
-A pasta `dist/` pode ser servida por qualquer servidor web estático.
+O projeto está configurado para deploy no Vercel. Após fazer push para o repositório, o Vercel fará o deploy automaticamente.
+
+## Tecnologias Utilizadas
+
+- React
+- TypeScript
+- Tailwind CSS
+- shadcn/ui
+- Supabase
+- Vite
 
 ## Segurança
 
