@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { jsPDF } from 'jspdf';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from './ui/button';
 import { Textarea } from './ui/textarea';
-import { generateBriefing } from '../lib/api';
+import { generateBriefing, getBriefings, saveBriefing } from '../lib/api';
 import { useBriefings } from '../contexts/BriefingContext';
 
 // Definir a URL da API com base no ambiente
@@ -53,8 +52,8 @@ export function BriefingGenerator() {
 
   const loadSavedBriefings = async () => {
     try {
-      const response = await axios.get(`${API_URL}/briefings/${user?.id}`);
-      setSavedBriefings(response.data);
+      const data = await getBriefings(user?.id || '');
+      setSavedBriefings(data);
     } catch (error) {
       console.error('Error loading briefings:', error);
       alert('Erro ao carregar briefings salvos');
@@ -81,20 +80,12 @@ export function BriefingGenerator() {
     }
   };
 
-  const saveBriefing = async () => {
+  const saveBriefingToSupabase = async () => {
     if (!user || !editedBriefing) return;
     
     try {
-      const response = await axios.post(`${API_URL}/briefings`, {
-        briefing: editedBriefing,
-        user_id: user.id
-      }, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      setSavedBriefings(prev => [response.data, ...prev]);
+      const data = await saveBriefing(editedBriefing, user.id);
+      setSavedBriefings(prev => [data, ...prev]);
       alert('Briefing salvo com sucesso!');
     } catch (error) {
       console.error('Error saving briefing:', error);
@@ -306,7 +297,7 @@ export function BriefingGenerator() {
           </div>
 
           <div className="flex gap-4">
-            <Button onClick={saveBriefing} className="flex-1">
+            <Button onClick={saveBriefingToSupabase} className="flex-1">
               Salvar Briefing
             </Button>
             <Button onClick={exportToPDF} className="flex-1">
