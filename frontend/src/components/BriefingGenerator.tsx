@@ -2,6 +2,10 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { jsPDF } from 'jspdf';
 import { useAuth } from '../contexts/AuthContext';
+import { Button } from './ui/button';
+import { Textarea } from './ui/textarea';
+import { generateBriefing } from '../lib/api';
+import { useBriefings } from '../contexts/BriefingContext';
 
 // Definir a URL da API com base no ambiente
 const API_URL = import.meta.env.PROD 
@@ -39,6 +43,7 @@ export function BriefingGenerator() {
   const [editedBriefing, setEditedBriefing] = useState<Briefing | null>(null);
   const [savedBriefings, setSavedBriefings] = useState<SavedBriefing[]>([]);
   const [loadingBriefings, setLoadingBriefings] = useState(true);
+  const { createBriefing } = useBriefings();
 
   useEffect(() => {
     if (user) {
@@ -58,20 +63,17 @@ export function BriefingGenerator() {
     }
   };
 
-  const generateBriefing = async () => {
-    if (!user) return;
-    
+  const handleGenerate = async () => {
+    if (!conversation.trim()) return;
+
     setLoading(true);
     try {
-      const response = await axios.post(`${API_URL}/generate-briefing`, {
-        conversation,
-        user_id: user.id
-      });
-      setBriefing(response.data);
-      setEditedBriefing(response.data);
+      const briefing = await generateBriefing(conversation);
+      await createBriefing(briefing);
+      setConversation('');
     } catch (error) {
       console.error('Error generating briefing:', error);
-      alert('Erro ao gerar briefing. Por favor, tente novamente.');
+      alert('Failed to generate briefing. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -192,204 +194,20 @@ export function BriefingGenerator() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <div className="mb-6">
-        <textarea
-          value={conversation}
-          onChange={(e) => setConversation(e.target.value)}
-          placeholder="Cole aqui a conversa com o cliente..."
-          className="w-full h-48 p-4 border rounded-lg focus:ring-2 focus:ring-blue-500"
-          disabled={loading}
-        />
-        <div className="flex space-x-4 mt-4">
-          <button
-            onClick={generateBriefing}
-            disabled={loading || !conversation.trim()}
-            className={`px-6 py-2 rounded-lg text-white font-medium
-              ${loading || !conversation.trim()
-                ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-blue-600 hover:bg-blue-700'
-              }`}
-          >
-            {loading ? 'Gerando briefing...' : 'Gerar Briefing'}
-          </button>
-          {editedBriefing && (
-            <button
-              onClick={saveBriefing}
-              className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium"
-            >
-              Salvar Briefing
-            </button>
-          )}
-        </div>
-      </div>
-
-      {editedBriefing && (
-        <div className="space-y-6 bg-white p-6 rounded-lg shadow-lg">
-          <div>
-            <h3 className="text-lg font-semibold mb-2">Objetivo</h3>
-            <textarea
-              value={editedBriefing.objetivo}
-              onChange={(e) => handleInputChange('objetivo', e.target.value)}
-              className="w-full p-2 border rounded"
-            />
-          </div>
-
-          <div>
-            <h3 className="text-lg font-semibold mb-2">Público-alvo</h3>
-            <textarea
-              value={editedBriefing.publico_alvo}
-              onChange={(e) => handleInputChange('publico_alvo', e.target.value)}
-              className="w-full p-2 border rounded"
-            />
-          </div>
-
-          <div>
-            <h3 className="text-lg font-semibold mb-2">Referências</h3>
-            {editedBriefing.referencias.map((ref, index) => (
-              <input
-                key={index}
-                type="text"
-                value={ref}
-                onChange={(e) => {
-                  const newRefs = [...editedBriefing.referencias];
-                  newRefs[index] = e.target.value;
-                  handleInputChange('referencias', newRefs);
-                }}
-                className="w-full p-2 border rounded mb-2"
-              />
-            ))}
-          </div>
-
-          <div>
-            <h3 className="text-lg font-semibold mb-2">Prazos</h3>
-            <div className="space-y-2">
-              <div>
-                <label className="block text-sm font-medium">Data de Início</label>
-                <input
-                  type="text"
-                  value={editedBriefing.prazos.inicio}
-                  onChange={(e) => handleInputChange('prazos', {
-                    ...editedBriefing.prazos,
-                    inicio: e.target.value
-                  })}
-                  className="w-full p-2 border rounded"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium">Data de Entrega</label>
-                <input
-                  type="text"
-                  value={editedBriefing.prazos.entrega}
-                  onChange={(e) => handleInputChange('prazos', {
-                    ...editedBriefing.prazos,
-                    entrega: e.target.value
-                  })}
-                  className="w-full p-2 border rounded"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium">Etapas Intermediárias</label>
-                <input
-                  type="text"
-                  value={editedBriefing.prazos.etapas_intermediarias}
-                  onChange={(e) => handleInputChange('prazos', {
-                    ...editedBriefing.prazos,
-                    etapas_intermediarias: e.target.value
-                  })}
-                  className="w-full p-2 border rounded"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <h3 className="text-lg font-semibold mb-2">Orçamento</h3>
-            <div className="space-y-2">
-              <div>
-                <label className="block text-sm font-medium">Total</label>
-                <input
-                  type="number"
-                  value={editedBriefing.orcamento.total}
-                  onChange={(e) => handleInputChange('orcamento', {
-                    ...editedBriefing.orcamento,
-                    total: parseFloat(e.target.value)
-                  })}
-                  className="w-full p-2 border rounded"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium">Por Etapa</label>
-                <input
-                  type="number"
-                  value={editedBriefing.orcamento.por_etapa}
-                  onChange={(e) => handleInputChange('orcamento', {
-                    ...editedBriefing.orcamento,
-                    por_etapa: parseFloat(e.target.value)
-                  })}
-                  className="w-full p-2 border rounded"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <h3 className="text-lg font-semibold mb-2">Observações</h3>
-            {editedBriefing.observacoes.map((obs, index) => (
-              <input
-                key={index}
-                type="text"
-                value={obs}
-                onChange={(e) => {
-                  const newObs = [...editedBriefing.observacoes];
-                  newObs[index] = e.target.value;
-                  handleInputChange('observacoes', newObs);
-                }}
-                className="w-full p-2 border rounded mb-2"
-              />
-            ))}
-          </div>
-
-          <div className="flex space-x-4">
-            <button
-              onClick={exportToPDF}
-              className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium"
-            >
-              Baixar PDF
-            </button>
-          </div>
-        </div>
-      )}
-
-      {loadingBriefings ? (
-        <div className="text-center mt-8">Carregando briefings salvos...</div>
-      ) : savedBriefings.length > 0 && (
-        <div className="mt-8">
-          <h2 className="text-2xl font-semibold mb-4">Briefings Salvos</h2>
-          <div className="space-y-4">
-            {savedBriefings.map((briefing) => (
-              <div
-                key={briefing.id}
-                className="bg-white p-4 rounded-lg shadow hover:shadow-md transition-shadow"
-              >
-                <h3 className="font-semibold">{briefing.titulo}</h3>
-                <p className="text-sm text-gray-500">
-                  Criado em: {new Date(briefing.created_at).toLocaleDateString()}
-                </p>
-                <button
-                  onClick={() => {
-                    setEditedBriefing(briefing.conteudo);
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}
-                  className="mt-2 text-blue-600 hover:text-blue-800"
-                >
-                  Editar
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+    <div className="space-y-4">
+      <Textarea
+        placeholder="Enter your conversation here..."
+        value={conversation}
+        onChange={(e) => setConversation(e.target.value)}
+        className="min-h-[200px]"
+      />
+      <Button
+        onClick={handleGenerate}
+        disabled={loading || !conversation.trim()}
+        className="w-full"
+      >
+        {loading ? 'Generating...' : 'Generate Briefing'}
+      </Button>
     </div>
   );
 } 

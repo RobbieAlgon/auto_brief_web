@@ -20,6 +20,7 @@ export default defineConfig({
           vendor: ['react', 'react-dom', 'react-router-dom'],
           supabase: ['@supabase/supabase-js'],
           pdf: ['jspdf'],
+          axios: ['axios'],
         },
       },
     },
