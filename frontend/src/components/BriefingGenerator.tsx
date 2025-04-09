@@ -3,6 +3,11 @@ import axios from 'axios';
 import { jsPDF } from 'jspdf';
 import { useAuth } from '../contexts/AuthContext';
 
+// Definir a URL da API com base no ambiente
+const API_URL = import.meta.env.PROD 
+  ? import.meta.env.VITE_PRODUCTION_API_URL 
+  : import.meta.env.VITE_API_URL;
+
 interface Briefing {
   objetivo: string;
   publico_alvo: string;
@@ -43,7 +48,7 @@ export function BriefingGenerator() {
 
   const loadSavedBriefings = async () => {
     try {
-      const response = await axios.get(`http://localhost:8000/briefings/${user?.id}`);
+      const response = await axios.get(`${API_URL}/briefings/${user?.id}`);
       setSavedBriefings(response.data);
     } catch (error) {
       console.error('Error loading briefings:', error);
@@ -58,7 +63,7 @@ export function BriefingGenerator() {
     
     setLoading(true);
     try {
-      const response = await axios.post('http://localhost:8000/generate-briefing', {
+      const response = await axios.post(`${API_URL}/generate-briefing`, {
         conversation,
         user_id: user.id
       });
@@ -76,7 +81,7 @@ export function BriefingGenerator() {
     if (!user || !editedBriefing) return;
     
     try {
-      const response = await axios.post('http://localhost:8000/briefings', {
+      const response = await axios.post(`${API_URL}/briefings`, {
         briefing: editedBriefing,
         user_id: user.id
       }, {
