@@ -68,8 +68,10 @@ export function BriefingGenerator() {
 
     setLoading(true);
     try {
-      const briefing = await generateBriefing(conversation);
-      await createBriefing(briefing);
+      const generatedBriefing = await generateBriefing(conversation);
+      setBriefing(generatedBriefing);
+      setEditedBriefing(generatedBriefing);
+      await createBriefing('Novo Briefing', JSON.stringify(generatedBriefing));
       setConversation('');
     } catch (error) {
       console.error('Error generating briefing:', error);
@@ -92,7 +94,6 @@ export function BriefingGenerator() {
         }
       });
       
-      // Add the new briefing to the list
       setSavedBriefings(prev => [response.data, ...prev]);
       alert('Briefing salvo com sucesso!');
     } catch (error) {
@@ -194,20 +195,142 @@ export function BriefingGenerator() {
   };
 
   return (
-    <div className="space-y-4">
-      <Textarea
-        placeholder="Enter your conversation here..."
-        value={conversation}
-        onChange={(e) => setConversation(e.target.value)}
-        className="min-h-[200px]"
-      />
-      <Button
-        onClick={handleGenerate}
-        disabled={loading || !conversation.trim()}
-        className="w-full"
-      >
-        {loading ? 'Generating...' : 'Generate Briefing'}
-      </Button>
+    <div className="space-y-8">
+      <div className="space-y-4">
+        <Textarea
+          placeholder="Digite sua conversa aqui..."
+          value={conversation}
+          onChange={(e) => setConversation(e.target.value)}
+          className="min-h-[200px]"
+        />
+        <Button
+          onClick={handleGenerate}
+          disabled={loading || !conversation.trim()}
+          className="w-full"
+        >
+          {loading ? 'Gerando...' : 'Gerar Briefing'}
+        </Button>
+      </div>
+
+      {editedBriefing && (
+        <div className="space-y-6">
+          <h2 className="text-2xl font-bold">Briefing Gerado</h2>
+          
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">Objetivo</label>
+              <Textarea
+                value={editedBriefing.objetivo}
+                onChange={(e) => handleInputChange('objetivo', e.target.value)}
+                className="min-h-[100px]"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Público-alvo</label>
+              <Textarea
+                value={editedBriefing.publico_alvo}
+                onChange={(e) => handleInputChange('publico_alvo', e.target.value)}
+                className="min-h-[100px]"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Referências</label>
+              <Textarea
+                value={editedBriefing.referencias.join('\n')}
+                onChange={(e) => handleInputChange('referencias', e.target.value.split('\n'))}
+                className="min-h-[100px]"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Data de Início</label>
+                <input
+                  type="date"
+                  value={editedBriefing.prazos.inicio}
+                  onChange={(e) => handleInputChange('prazos', { ...editedBriefing.prazos, inicio: e.target.value })}
+                  className="w-full p-2 border rounded"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Data de Entrega</label>
+                <input
+                  type="date"
+                  value={editedBriefing.prazos.entrega}
+                  onChange={(e) => handleInputChange('prazos', { ...editedBriefing.prazos, entrega: e.target.value })}
+                  className="w-full p-2 border rounded"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Etapas Intermediárias</label>
+                <input
+                  type="text"
+                  value={editedBriefing.prazos.etapas_intermediarias}
+                  onChange={(e) => handleInputChange('prazos', { ...editedBriefing.prazos, etapas_intermediarias: e.target.value })}
+                  className="w-full p-2 border rounded"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Orçamento Total</label>
+                <input
+                  type="number"
+                  value={editedBriefing.orcamento.total}
+                  onChange={(e) => handleInputChange('orcamento', { ...editedBriefing.orcamento, total: Number(e.target.value) })}
+                  className="w-full p-2 border rounded"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Orçamento por Etapa</label>
+                <input
+                  type="number"
+                  value={editedBriefing.orcamento.por_etapa}
+                  onChange={(e) => handleInputChange('orcamento', { ...editedBriefing.orcamento, por_etapa: Number(e.target.value) })}
+                  className="w-full p-2 border rounded"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Observações</label>
+              <Textarea
+                value={editedBriefing.observacoes.join('\n')}
+                onChange={(e) => handleInputChange('observacoes', e.target.value.split('\n'))}
+                className="min-h-[100px]"
+              />
+            </div>
+          </div>
+
+          <div className="flex gap-4">
+            <Button onClick={saveBriefing} className="flex-1">
+              Salvar Briefing
+            </Button>
+            <Button onClick={exportToPDF} className="flex-1">
+              Exportar PDF
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {savedBriefings.length > 0 && (
+        <div className="space-y-4">
+          <h2 className="text-2xl font-bold">Briefings Salvos</h2>
+          <div className="grid gap-4">
+            {savedBriefings.map((savedBriefing) => (
+              <div key={savedBriefing.id} className="p-4 border rounded-lg">
+                <h3 className="font-bold">{savedBriefing.titulo}</h3>
+                <p className="text-sm text-gray-500">
+                  Criado em: {new Date(savedBriefing.created_at).toLocaleDateString()}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 } 
