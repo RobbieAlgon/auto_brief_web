@@ -6,7 +6,7 @@
       "use": "@vercel/static-build",
       "config": {
         "distDir": "dist",
-        "buildCommand": "cd frontend && npm install && npm run build",
+        "buildCommand": "cd frontend && cp .npmrc . && npm install && npm run build",
         "nodeVersion": "22.x"
       }
     },
