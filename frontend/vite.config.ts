@@ -15,12 +15,13 @@ export default defineConfig({
     sourcemap: false,
     minify: 'terser',
     rollupOptions: {
+      external: ['axios'],
       output: {
         manualChunks: {
-          vendor: ['react', 'react-dom', 'react-router-dom'],
+          vendor: ['react', 'react-dom', 'react-router-dom', 'axios'],
           supabase: ['@supabase/supabase-js'],
           pdf: ['jspdf'],
-          axios: ['axios'],
+          ui: ['@radix-ui/react-alert-dialog', '@radix-ui/react-dialog', '@radix-ui/react-label', '@radix-ui/react-slot', '@radix-ui/react-toast'],
         },
       },
     },
