@@ -8,7 +8,7 @@
         "distDir": "dist",
         "buildCommand": "npm run build",
         "installCommand": "npm install --legacy-peer-deps --force",
-        "nodeVersion": "18.x"
+        "nodeVersion": "22.x"
       }
     },
     {
