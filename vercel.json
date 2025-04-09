@@ -7,7 +7,8 @@
       "config": {
         "distDir": "dist",
         "buildCommand": "npm run build",
-        "installCommand": "npm install --legacy-peer-deps"
+        "installCommand": "npm install --legacy-peer-deps --force",
+        "nodeVersion": "18.x"
       }
     },
     {
