@@ -1,81 +1,84 @@
-# AI Briefing Generator
+# Sistema de Briefings
 
-A fullstack application that generates structured briefings from text input using AI. Built with React, FastAPI, and Groq's Mixtral model.
+Sistema para geração e gerenciamento de briefings usando IA.
 
-## Features
+## Funcionalidades
 
-- Text input interface for submitting content
-- AI-powered analysis using Groq's Mixtral model
-- Structured briefing output with:
-  - Key points
-  - Action items
-  - Summary
-  - Sentiment analysis
-  - Priority level
-- Persistent storage using Supabase
-- Modern UI with Tailwind CSS and shadcn/ui
+- Geração de briefings usando IA (Groq)
+- Autenticação de usuários
+- Armazenamento de briefings no Supabase
+- Interface web responsiva
 
-## Setup
+## Tecnologias Utilizadas
 
-### Prerequisites
+- Python/Flask (Backend)
+- Supabase (Banco de dados)
+- Groq (IA)
+- HTML/CSS/JavaScript (Frontend)
 
-- Python 3.8+
-- Node.js 16+
-- npm or yarn
-- Supabase account
-- Groq API key
+## Configuração do Ambiente
 
-### Environment Variables
-
-Create `.env` files in both frontend and backend directories:
-
-Backend `.env`:
-```
-SUPABASE_URL=your_supabase_url
-SUPABASE_KEY=your_supabase_key
-GROQ_API_KEY=your_groq_api_key
-```
-
-### Installation
-
-1. Clone the repository
-2. Set up the backend:
+1. Clone o repositório
+2. Instale as dependências:
 ```bash
-cd backend
 pip install -r requirements.txt
-uvicorn main:app --reload
 ```
 
-3. Set up the frontend:
+3. Configure as variáveis de ambiente no arquivo `.env`:
+```
+SUPABASE_URL=sua_url_do_supabase
+SUPABASE_KEY=sua_chave_do_supabase
+GROQ_API_KEY=sua_chave_da_groq
+SECRET_KEY=sua_chave_secreta
+```
+
+4. Execute o servidor:
 ```bash
-cd frontend
-npm install
-npm run dev
+python main.py
 ```
 
-4. Create a table in your Supabase database:
-```sql
-create table briefings (
-  id uuid default uuid_generate_v4() primary key,
-  input_text text not null,
-  structured_briefing jsonb not null,
-  created_at timestamp with time zone default timezone('utc'::text, now()) not null
-);
+## Deploy na Vercel
+
+1. Crie uma conta na [Vercel](https://vercel.com)
+2. Instale a CLI da Vercel:
+```bash
+npm i -g vercel
 ```
 
-## Usage
+3. Faça login na Vercel:
+```bash
+vercel login
+```
 
-1. Open the application in your browser (default: http://localhost:3000)
-2. Enter text in the input field
-3. Click "Generate Briefing"
-4. View the structured briefing output
+4. Deploy do projeto:
+```bash
+vercel
+```
 
-## Development
+5. Configure as variáveis de ambiente na Vercel:
+- SUPABASE_URL
+- SUPABASE_KEY
+- GROQ_API_KEY
+- SECRET_KEY
 
-- Backend API runs on http://localhost:8000
-- Frontend development server runs on http://localhost:3000
-- API documentation available at http://localhost:8000/docs
+## Estrutura do Projeto
 
-## License
+```
+.
+├── main.py              # Aplicação Flask
+├── requirements.txt     # Dependências Python
+├── vercel.json         # Configuração Vercel
+├── .env                # Variáveis de ambiente
+└── templates/          # Templates HTML
+    ├── index.html
+    ├── login.html
+    └── register.html
+```
 
-MIT 
+## Contribuição
+
+1. Fork o projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
+5. Abra um Pull Request 

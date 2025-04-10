@@ -1,4 +1,13 @@
--- Create briefings table
+-- Drop existing policies
+DROP POLICY IF EXISTS "Users can read their own briefings" ON briefings;
+DROP POLICY IF EXISTS "Users can insert their own briefings" ON briefings;
+DROP POLICY IF EXISTS "Users can update their own briefings" ON briefings;
+DROP POLICY IF EXISTS "Users can delete their own briefings" ON briefings;
+
+-- Drop existing table
+DROP TABLE IF EXISTS briefings;
+
+-- Create briefings table with new schema
 CREATE TABLE briefings (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     user_id TEXT NOT NULL,

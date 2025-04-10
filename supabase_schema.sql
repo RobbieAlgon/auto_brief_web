@@ -2,7 +2,8 @@
 CREATE TABLE briefings (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     user_id TEXT NOT NULL,
-    content JSONB NOT NULL,
+    input_text TEXT NOT NULL,
+    briefing_result TEXT NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
     FOREIGN KEY (user_id) REFERENCES auth.users(id)
 );

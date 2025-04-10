@@ -1,8 +1,0 @@
-{
-  "dependencies": {
-    "react-router-dom": "^7.5.0"
-  },
-  "devDependencies": {
-    "terser": "^5.39.0"
-  }
-}
